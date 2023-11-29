@@ -17,7 +17,7 @@ public interface StatRepository extends JpaRepository<Stat, Long> {
 			"WHERE s.created BETWEEN :start AND :end " +
 			"AND s.uri IN :uris " +
 			"GROUP BY s.app, s.uri " +
-			"ORDER BY s.app DESC")
+			"ORDER BY COUNT(DISTINCT s.ip) DESC")
 	List<StatResponceDto> findStatsWithUniqueIp(LocalDateTime start, LocalDateTime end, List<String> uris);
 
 	@Query("SELECT NEW ru.practicum.statserver.dto.StatResponceDto(s.app, s.uri, COUNT(s.ip)) " +
@@ -25,21 +25,21 @@ public interface StatRepository extends JpaRepository<Stat, Long> {
 			"WHERE s.created BETWEEN :start AND :end " +
 			"AND s.uri IN :uris " +
 			"GROUP BY s.app, s.uri " +
-			"ORDER BY s.app DESC")
+			"ORDER BY COUNT(s.ip) DESC")
 	List<StatResponceDto> findStatsWithNotUniqueIp(LocalDateTime start, LocalDateTime end, List<String> uris);
 
 	@Query("SELECT NEW ru.practicum.statserver.dto.StatResponceDto(s.app, s.uri, COUNT(DISTINCT s.ip))" +
 			"FROM Stat s " +
 			"WHERE s.created BETWEEN :start AND :end " +
 			"GROUP BY s.app, s.uri " +
-			"ORDER BY s.app DESC")
+			"ORDER BY COUNT(DISTINCT s.ip) DESC")
 	List<StatResponceDto> findStatsWithUniqueIp(LocalDateTime start, LocalDateTime end);
 
 	@Query("SELECT NEW ru.practicum.statserver.dto.StatResponceDto(s.app, s.uri, COUNT(s.ip)) " +
 			"FROM Stat s " +
 			"WHERE s.created BETWEEN :start AND :end " +
 			"GROUP BY s.app, s.uri " +
-			"ORDER BY s.app DESC")
+			"ORDER BY COUNT(s.ip) DESC")
 	List<StatResponceDto> findStatsWithNotUniqueIp(LocalDateTime start, LocalDateTime end);
 
 
