@@ -1,8 +1,5 @@
 package ru.practicum.statserver.exception;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 public class ErrorResponse {
 
 	private final String error;
