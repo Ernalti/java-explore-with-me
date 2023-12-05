@@ -18,6 +18,7 @@ import java.util.List;
 public class CategoryPublicController {
 
 	private final CategoryService categoryService;
+
 	@Autowired
 	public CategoryPublicController(CategoryService categoryService) {
 		this.categoryService = categoryService;

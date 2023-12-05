@@ -3,7 +3,6 @@ package ru.practicum.ewmservice.service;
 import ru.practicum.ewmservice.dto.NewUserRequest;
 import ru.practicum.ewmservice.dto.UserDto;
 
-import javax.validation.Valid;
 import java.util.List;
 
 public interface UserService {

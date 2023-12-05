@@ -308,8 +308,7 @@ public class EventServiceImpl implements EventService {
 	}
 
 	private Event updateEvents(Event oldEvent, UpdateEventRequest updateEvent) {
-		String gotAnnotation = updateEvent.
-				getAnnotation();
+		String gotAnnotation = updateEvent.getAnnotation();
 
 		if (gotAnnotation != null && !gotAnnotation.isBlank()) {
 			oldEvent.setAnnotation(gotAnnotation);

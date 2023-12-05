@@ -1,10 +1,7 @@
 package ru.practicum.ewmservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import ru.practicum.ewmservice.model.enums.StateActionUser;
 
 import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.Size;

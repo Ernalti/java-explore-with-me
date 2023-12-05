@@ -31,6 +31,6 @@ public class Request {
 	private User requester;
 
 	@Enumerated(EnumType.STRING)
-	@Column( nullable = false)
+	@Column(nullable = false)
 	private RequestStatus status;
 }

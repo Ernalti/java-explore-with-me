@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
-public class CompilationServiceImpl implements CompilationService{
+public class CompilationServiceImpl implements CompilationService {
 
 	private final CompilationRepository compilationRepository;
 	private final EventRepository eventRepository;
@@ -33,7 +33,7 @@ public class CompilationServiceImpl implements CompilationService{
 	@Transactional
 	public CompilationDto createCompilation(NewCompilationDto compilationDto) {
 		Compilation compilation = CompilationMapper.dtoToCompilation(compilationDto);
-		compilation.setPinned(compilation.getPinned()!=null && compilation.getPinned());
+		compilation.setPinned(compilation.getPinned() != null && compilation.getPinned());
 
 		Set<Long> compEventIds = (compilationDto.getEvents() != null) ? compilationDto.getEvents() : Collections.emptySet();
 		List<Long> eventIds = new ArrayList<>(compEventIds);
@@ -57,11 +57,11 @@ public class CompilationServiceImpl implements CompilationService{
 			compilation.setEvents(eventSet);
 		}
 
-		compilation.setPinned(compilation.getPinned()!=null && compilation.getPinned());
+		compilation.setPinned(compilation.getPinned() != null && compilation.getPinned());
 		if (compilation.getTitle().isBlank()) {
 			throw new ConditionException("Title can't be is blank");
 		}
-		compilation.setTitle(compilationDto.getTitle()!=null ? compilationDto.getTitle() : compilation.getTitle());
+		compilation.setTitle(compilationDto.getTitle() != null ? compilationDto.getTitle() : compilation.getTitle());
 
 		return CompilationMapper.compilationToDto(compilation);
 	}

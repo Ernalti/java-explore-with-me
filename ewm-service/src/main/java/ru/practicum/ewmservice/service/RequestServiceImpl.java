@@ -19,11 +19,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class RequestServiceImpl implements RequestService{
+public class RequestServiceImpl implements RequestService {
 
 	private final UserRepository userRepository;
 	private final EventRepository eventRepository;
 	private final RequestRepository requestRepository;
+
 	@Autowired
 	public RequestServiceImpl(UserRepository userRepository, EventRepository eventRepository, RequestRepository requestRepository) {
 		this.userRepository = userRepository;
