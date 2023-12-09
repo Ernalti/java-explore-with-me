@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.statdto.StatDto;
-import ru.practicum.statserver.dto.StatResponceDto;
+import ru.practicum.statdto.StatResponceDto;
 import ru.practicum.statserver.exception.IllegalTimeException;
 import ru.practicum.statserver.mapper.StatMapper;
 import ru.practicum.statserver.model.Stat;

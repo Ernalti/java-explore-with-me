@@ -52,6 +52,7 @@ public class EventMapper {
 				.initiator(UserMapper.userToUserShortDto(event.getInitiator()))
 				.paid(event.isPaid())
 				.title(event.getTitle())
+				.publishedDate(event.getPublishedDate())
 				.build();
 	}
 }

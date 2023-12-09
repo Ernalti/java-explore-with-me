@@ -30,23 +30,24 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
 	Optional<Event> findByIdAndInitiatorId(Long eventId, Long userId);
 
-	@Query("SELECT e FROM Event e " +
-			"WHERE e.state = 'PUBLISHED' " +
-			"AND (:text IS NULL OR (LOWER(e.annotation) LIKE LOWER(:text) OR LOWER(e.description) LIKE LOWER(:text))) " +
-			"AND (:categories IS NULL OR e.category.id IN :categories) " +
-			"AND (:paid IS NULL OR e.paid = :paid) " +
-			"AND e.eventDate BETWEEN :rangeStart AND :rangeEnd " +
-			"AND (:onlyAvailable = true AND size(e.requests) < e.participantLimit " +
-			"     OR :onlyAvailable = false) " +
-			"ORDER BY e.views DESC")
-	Page<Event> findEventsByFiltersSortByViews(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, Pageable page);
+//	@Query("SELECT e FROM Event e " +
+//			"WHERE e.state = 'PUBLISHED' " +
+//			"AND (:text IS NULL OR (LOWER(e.annotation) LIKE LOWER(:text) OR LOWER(e.description) LIKE LOWER(:text))) " +
+//			"AND (:categories IS NULL OR e.category.id IN :categories) " +
+//			"AND (:paid IS NULL OR e.paid = :paid) " +
+//			"AND e.eventDate BETWEEN :rangeStart AND :rangeEnd " +
+//			"AND (:onlyAvailable = true AND size(e.requests) < e.participantLimit " +
+//			"     OR :onlyAvailable = false) " +
+//			"ORDER BY e.views DESC")
+//	Page<Event> findEventsByFiltersSortByViews(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, Pageable page);
 
 	@Query("SELECT e FROM Event e " +
 			"WHERE e.state = 'PUBLISHED' " +
 			"AND (:text IS NULL OR (LOWER(e.annotation) LIKE LOWER(:text) OR LOWER(e.description) LIKE LOWER(:text))) " +
 			"AND (:categories IS NULL OR e.category.id IN :categories) " +
 			"AND (:paid IS NULL OR e.paid = :paid) " +
-			"AND e.eventDate BETWEEN :rangeStart AND :rangeEnd " +
+			"AND (CAST(:rangeStart AS date) IS NULL OR e.eventDate >= :rangeStart) " +
+			"AND (CAST(:rangeEnd AS date) IS NULL OR e.eventDate <= :rangeEnd) " +
 			"AND (:onlyAvailable = true AND size(e.requests) < e.participantLimit " +
 			"     OR :onlyAvailable = false) " +
 			"ORDER BY e.eventDate DESC")

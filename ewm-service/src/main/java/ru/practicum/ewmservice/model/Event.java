@@ -62,5 +62,5 @@ public class Event {
 	@Column(nullable = false)
 	private String title;
 
-	private Integer views;
+//	private Integer views;
 }

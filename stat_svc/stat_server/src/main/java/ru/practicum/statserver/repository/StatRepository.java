@@ -2,7 +2,7 @@ package ru.practicum.statserver.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import ru.practicum.statserver.dto.StatResponceDto;
+import ru.practicum.statdto.StatResponceDto;
 import ru.practicum.statserver.model.Stat;
 
 import java.time.LocalDateTime;
@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface StatRepository extends JpaRepository<Stat, Long> {
 
-	@Query("SELECT NEW ru.practicum.statserver.dto.StatResponceDto(s.app, s.uri, COUNT(DISTINCT s.ip))" +
+	@Query("SELECT NEW ru.practicum.statdto.StatResponceDto(s.app, s.uri, COUNT(DISTINCT s.ip))" +
 			"FROM Stat s " +
 			"WHERE s.created BETWEEN :start AND :end " +
 			"AND s.uri IN :uris " +
@@ -18,7 +18,7 @@ public interface StatRepository extends JpaRepository<Stat, Long> {
 			"ORDER BY COUNT(DISTINCT s.ip) DESC")
 	List<StatResponceDto> findStatsWithUniqueIp(LocalDateTime start, LocalDateTime end, List<String> uris);
 
-	@Query("SELECT NEW ru.practicum.statserver.dto.StatResponceDto(s.app, s.uri, COUNT(s.ip)) " +
+	@Query("SELECT NEW ru.practicum.statdto.StatResponceDto(s.app, s.uri, COUNT(s.ip)) " +
 			"FROM Stat s " +
 			"WHERE s.created BETWEEN :start AND :end " +
 			"AND s.uri IN :uris " +
@@ -26,14 +26,14 @@ public interface StatRepository extends JpaRepository<Stat, Long> {
 			"ORDER BY COUNT(s.ip) DESC")
 	List<StatResponceDto> findStatsWithNotUniqueIp(LocalDateTime start, LocalDateTime end, List<String> uris);
 
-	@Query("SELECT NEW ru.practicum.statserver.dto.StatResponceDto(s.app, s.uri, COUNT(DISTINCT s.ip))" +
+	@Query("SELECT NEW ru.practicum.statdto.StatResponceDto(s.app, s.uri, COUNT(DISTINCT s.ip))" +
 			"FROM Stat s " +
 			"WHERE s.created BETWEEN :start AND :end " +
 			"GROUP BY s.app, s.uri " +
 			"ORDER BY COUNT(DISTINCT s.ip) DESC")
 	List<StatResponceDto> findStatsWithUniqueIp(LocalDateTime start, LocalDateTime end);
 
-	@Query("SELECT NEW ru.practicum.statserver.dto.StatResponceDto(s.app, s.uri, COUNT(s.ip)) " +
+	@Query("SELECT NEW ru.practicum.statdto.StatResponceDto(s.app, s.uri, COUNT(s.ip)) " +
 			"FROM Stat s " +
 			"WHERE s.created BETWEEN :start AND :end " +
 			"GROUP BY s.app, s.uri " +

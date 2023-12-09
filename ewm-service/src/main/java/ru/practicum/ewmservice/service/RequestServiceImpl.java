@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewmservice.dto.ParticipationRequestDto;
 import ru.practicum.ewmservice.exception.exceptions.ConflictException;
+import ru.practicum.ewmservice.exception.exceptions.NotFoundException;
 import ru.practicum.ewmservice.mapper.RequestMapper;
 import ru.practicum.ewmservice.model.Event;
 import ru.practicum.ewmservice.model.Request;
@@ -35,7 +36,7 @@ public class RequestServiceImpl implements RequestService {
 
 	@Override
 	public List<ParticipationRequestDto> findRequestsForUser(Long userId) {
-		getUser(userId);
+//		getUser(userId);
 		List<Request> result = requestRepository.findAllByRequesterId(userId);
 		return result.stream().map(RequestMapper::requestToDto).collect(Collectors.toList());
 	}
@@ -93,6 +94,7 @@ public class RequestServiceImpl implements RequestService {
 	}
 
 	private User getUser(Long userId) {
-		return userRepository.findById(userId).orElseThrow();
+		return userRepository.findById(userId).orElseThrow(() ->
+				new NotFoundException("Категории с id = " + userId + " не существует"));
 	}
 }
