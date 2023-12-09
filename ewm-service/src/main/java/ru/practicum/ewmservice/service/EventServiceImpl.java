@@ -404,7 +404,7 @@ public class EventServiceImpl implements EventService {
 	private Map<Long, Long> getViews(List<Event> events) {
 //		statsClient.getStatistics(event.getPublishedDate().minusMinutes(1).toString(), LocalDateTime.now().toString(), List.of(new String[]{("/events/" + event.getId())}), true).getBody();
 
-		if (events.size()==0) {
+		if (events.size() == 0) {
 			return new HashMap<>();
 		}
 
