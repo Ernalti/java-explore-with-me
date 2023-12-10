@@ -35,7 +35,7 @@ public class UserAdminController {
 		return userService.getUsers(ids, from, size);
 	}
 
-	@PatchMapping
+	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public UserDto createUser(@RequestBody @Valid NewUserRequest newUserRequest) {
 		log.info("Create User");

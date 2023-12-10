@@ -52,7 +52,7 @@ public class EventPrivateController {
 	@PatchMapping("/{eventId}")
 	public EventFullDto patchEventByIdForOwner(@PathVariable Long userId,
 			                                   @PathVariable Long eventId,
-			                                   @Valid @RequestBody UpdateEventUserRequest updateEvent) {
+			                                   @RequestBody @Valid UpdateEventUserRequest updateEvent) {
 		log.info("Patch event by id for owner");
 		return eventService.patchEventByIdForOwner(userId, eventId, updateEvent);
 	}

@@ -1,16 +1,15 @@
 package ru.practicum.ewmservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 import ru.practicum.ewmservice.model.enums.EventState;
 
 import java.time.LocalDateTime;
 
 @Data
-@AllArgsConstructor
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class EventFullDto {
 
 	private Long id;

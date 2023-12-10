@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +33,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+//@Configuration
+@ComponentScan("ru.practicum.stat_client")
 @Service
 @Transactional(readOnly = true)
 public class EventServiceImpl implements EventService {
@@ -166,7 +169,7 @@ public class EventServiceImpl implements EventService {
 
 		Event event = getEvent(eventId);
 
-		if (updateEvent.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
+		if (updateEvent.getEventDate() != null && updateEvent.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
 			throw new ValidationException("The time cannot be earlier than two hours later.");
 		}
 
