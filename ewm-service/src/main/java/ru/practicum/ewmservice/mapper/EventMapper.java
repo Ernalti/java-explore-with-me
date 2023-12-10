@@ -5,6 +5,7 @@ import ru.practicum.ewmservice.dto.EventFullDto;
 import ru.practicum.ewmservice.dto.EventShortDto;
 import ru.practicum.ewmservice.dto.NewEventDto;
 import ru.practicum.ewmservice.model.Event;
+import ru.practicum.ewmservice.model.enums.RequestStatus;
 
 @UtilityClass
 public class EventMapper {
@@ -25,12 +26,16 @@ public class EventMapper {
 
 	public EventFullDto eventToEventFullDto(Event event) {
 		return EventFullDto.builder()
-				.id(event.getId())
 				.annotation(event.getAnnotation())
 				.category(CategoryMapper.categoryToCategoryDto(event.getCategory()))
+				.confirmedRequests(event.getRequests() == null ? 0 : event.getRequests()
+						.stream()
+						.filter(x -> x.getStatus().equals(RequestStatus.CONFIRMED))
+						.count())
 				.createdOn(event.getCreatedOn())
 				.description(event.getDescription())
 				.eventDate(event.getEventDate())
+				.id(event.getId())
 				.initiator(UserMapper.userToUserShortDto(event.getInitiator()))
 				.location(LocationMapper.locationToLocationDto(event.getLocation()))
 				.paid(event.isPaid())
