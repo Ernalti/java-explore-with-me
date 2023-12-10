@@ -75,7 +75,7 @@ public class EventServiceImpl implements EventService {
 
 		if (states != null) {
 			eventStates = states.stream()
-					.map(x -> EventState.valueOf(x))
+					.map(EventState::valueOf)
 					.collect(Collectors.toList());
 		}
 
@@ -129,7 +129,7 @@ public class EventServiceImpl implements EventService {
 		Pageable page = PageRequest.of(from / size, size);
 		List<Event> events = eventRepository.findAllByInitiatorId(userId, page).toList();
 		return events.stream()
-				.map(x -> EventMapper.eventToEventShortDto(x))
+				.map(EventMapper::eventToEventShortDto)
 				.collect(Collectors.toList());
 	}
 
