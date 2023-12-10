@@ -159,8 +159,7 @@ public class EventServiceImpl implements EventService {
 	public EventFullDto findEventByIdForOwner(Long userId, Long eventId) {
 		getUser(userId);
 
-		Event event = getEventByEventIdAndUserId(eventId, userId);
-
+		Event event = getEventByEventIdAndUserId(userId, eventId);
 		if (event == null) {
 			throw new EntityNotFoundException("Event" + eventId + "not found");
 		}
@@ -201,7 +200,7 @@ public class EventServiceImpl implements EventService {
 	@Override
 	public List<ParticipationRequestDto> findEventsRequests(Long userId, Long eventId) {
 		getUser(userId);
-		getEventByEventIdAndUserId(eventId, userId);
+		getEventByEventIdAndUserId(userId, eventId);
 		List<Request> requests = requestRepository.findAllByEventId(eventId);
 		return requests.stream().map(RequestMapper::requestToDto).collect(Collectors.toList());
 	}
@@ -304,8 +303,6 @@ public class EventServiceImpl implements EventService {
 				.orElseThrow(() -> new EntityNotFoundException("Event" + eventId + "not found"));
 
 		Long views = getEventViews(event);
-
-//		event.setViews(views);
 
 		if (!event.getState().equals(EventState.PUBLISHED)) {
 			throw new EntityNotFoundException(String.format("Event %s not found", eventId));
@@ -411,7 +408,6 @@ public class EventServiceImpl implements EventService {
 	}
 
 	private Map<Long, Long> getViews(List<Event> events) {
-//		statsClient.getStatistics(event.getPublishedDate().minusMinutes(1).toString(), LocalDateTime.now().toString(), List.of(new String[]{("/events/" + event.getId())}), true).getBody();
 
 		if (events.size() == 0) {
 			return new HashMap<>();

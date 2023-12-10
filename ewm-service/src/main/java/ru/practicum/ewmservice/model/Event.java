@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Data
 public class Event {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -61,6 +62,4 @@ public class Event {
 
 	@Column(nullable = false)
 	private String title;
-
-//	private Integer views;
 }

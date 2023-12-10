@@ -36,7 +36,6 @@ public class RequestServiceImpl implements RequestService {
 
 	@Override
 	public List<ParticipationRequestDto> findRequestsForUser(Long userId) {
-//		getUser(userId);
 		List<Request> result = requestRepository.findAllByRequesterId(userId);
 		return result.stream().map(RequestMapper::requestToDto).collect(Collectors.toList());
 	}
