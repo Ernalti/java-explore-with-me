@@ -62,7 +62,7 @@ public class ErrorHandler {
 
 	@ExceptionHandler
 	@ResponseStatus(HttpStatus.CONFLICT)
-	public ErrorResponse DataIntegrityViolationError(final DataIntegrityViolationException e) {
+	public ErrorResponse dataIntegrityViolationError(final DataIntegrityViolationException e) {
 		log.debug("Get status 409 {}", e.getMessage(), e);
 		return new ErrorResponse(e.getMessage());
 	}

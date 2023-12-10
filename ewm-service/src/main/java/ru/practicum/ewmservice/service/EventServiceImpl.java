@@ -330,7 +330,7 @@ public class EventServiceImpl implements EventService {
 		return eventRepository.findById(eventId).orElseThrow();
 	}
 
-	private Event getEventByEventIdAndUserId( Long userId, Long eventId) {
+	private Event getEventByEventIdAndUserId(Long userId, Long eventId) {
 		Event res = eventRepository.findByIdAndInitiatorId(eventId, userId).orElseThrow();
 		return res;
 	}
@@ -434,7 +434,7 @@ public class EventServiceImpl implements EventService {
 
 		if (earliestDate != null) {
 			ResponseEntity<Object> response = statsClient.getStatistics(earliestDate, now, uris, true);
-			if (response.getStatusCode()!= HttpStatus.OK) {
+			if (response.getStatusCode() != HttpStatus.OK) {
 				return new HashMap<>();
 			}
 			List<StatResponceDto> viewStatsList = objectMapper.convertValue(response.getBody(), new TypeReference<>() {});
