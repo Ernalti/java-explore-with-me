@@ -26,8 +26,8 @@ public class NewEventDto {
 	@NotNull
 	private Long category;
 
-	@Size(min = 20, max = 7000)
 	@NotBlank
+	@Size(min = 20, max = 7000)
 	private String description;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
@@ -37,14 +37,17 @@ public class NewEventDto {
 	@NotNull
 	private LocationDto location;
 
+	@Builder.Default
 	@NotNull
-	private Boolean paid;
+	private Boolean paid = false;
 
+	@Builder.Default
 	@NotNull
-	private Integer participantLimit;
+	private Integer participantLimit = 0;
 
+	@Builder.Default
 	@NotNull
-	private Boolean requestModeration;
+	private Boolean requestModeration = true;
 
 	@Size(min = 3, max = 120)
 	@NotBlank

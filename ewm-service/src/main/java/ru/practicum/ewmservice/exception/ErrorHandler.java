@@ -1,6 +1,7 @@
 package ru.practicum.ewmservice.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -32,9 +33,9 @@ public class ErrorHandler {
 	}
 
 	@ExceptionHandler
-	@ResponseStatus(HttpStatus.CONFLICT)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ErrorResponse validationError(final ValidationException e) {
-		log.debug("Get status 409 {}", e.getMessage(), e);
+		log.debug("Get status 400 {}", e.getMessage(), e);
 		return new ErrorResponse(e.getMessage());
 	}
 
@@ -59,6 +60,11 @@ public class ErrorHandler {
 		return new ErrorResponse(e.getMessage());
 	}
 
-
+	@ExceptionHandler
+	@ResponseStatus(HttpStatus.CONFLICT)
+	public ErrorResponse DataIntegrityViolationError(final DataIntegrityViolationException e) {
+		log.debug("Get status 409 {}", e.getMessage(), e);
+		return new ErrorResponse(e.getMessage());
+	}
 
 }

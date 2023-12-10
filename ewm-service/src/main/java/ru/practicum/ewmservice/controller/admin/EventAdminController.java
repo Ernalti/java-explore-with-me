@@ -42,10 +42,10 @@ public class EventAdminController {
 
 	@PatchMapping("/{eventId}")
 	public EventFullDto patchEventById(@PathVariable Long eventId,
-	                           @Valid @RequestBody
-	                           UpdateEventAdminRequest updateEventAdminRequest) {
+	                           @Valid @RequestBody UpdateEventAdminRequest updateEventAdminRequest) {
 		log.info("Patch event by id");
-		return eventService.patchEventById(eventId, updateEventAdminRequest);
+		EventFullDto res = eventService.patchEventById(eventId, updateEventAdminRequest);
+		return res;
 	}
 
 }

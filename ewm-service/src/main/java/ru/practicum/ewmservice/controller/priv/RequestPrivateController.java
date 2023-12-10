@@ -2,6 +2,7 @@ package ru.practicum.ewmservice.controller.priv;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewmservice.dto.ParticipationRequestDto;
@@ -30,6 +31,7 @@ public class RequestPrivateController {
 	}
 
 	@PostMapping
+	@ResponseStatus(HttpStatus.CREATED)
 	public ParticipationRequestDto createRequest(@PathVariable Long userId,
 	                          @Positive @RequestParam(required = true) Long eventId) {
 		log.info("Create request for user");

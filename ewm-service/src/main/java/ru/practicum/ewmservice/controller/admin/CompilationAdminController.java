@@ -7,6 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewmservice.dto.CompilationDto;
 import ru.practicum.ewmservice.dto.NewCompilationDto;
+import ru.practicum.ewmservice.dto.ValidationGroup;
 import ru.practicum.ewmservice.service.CompilationService;
 
 import javax.validation.Valid;
@@ -26,6 +27,7 @@ public class CompilationAdminController {
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
+	@Validated(ValidationGroup.CreateUser.class)
 	public CompilationDto createCompilation(@RequestBody @Valid NewCompilationDto compilationDto) {
 		log.info("Add compilation");
 		return compilationService.createCompilation(compilationDto);

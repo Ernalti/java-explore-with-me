@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +34,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-//@Configuration
 @ComponentScan("ru.practicum.stat_client")
 @Service
 @Transactional(readOnly = true)
@@ -65,9 +65,11 @@ public class EventServiceImpl implements EventService {
 	@Override
 	public List<EventFullDto> findEvents(List<Long> users, List<String> states, List<Long> categories, LocalDateTime rangeStart, LocalDateTime rangeEnd, int from, int size) {
 		Pageable page = PageRequest.of(from / size, size);
-		if (rangeStart.isAfter(rangeEnd)) {
+
+		if (rangeStart != null && rangeEnd != null && rangeStart.isAfter(rangeEnd)) {
 			throw new ValidationException("End time cannot be earlier than start time");
 		}
+
 
 		List<EventState> eventStates = null;
 
@@ -78,9 +80,14 @@ public class EventServiceImpl implements EventService {
 		}
 
 		List<Event> events = eventRepository.searchEvents(users, eventStates, categories, rangeStart, rangeEnd, page).toList();
-		return events.stream()
-				.map(x -> EventMapper.eventToEventFullDto(x))
+
+		Map<Long,Long> idsAndHits = getViews(events);
+		List<EventFullDto> eventDto = events.stream()
+				.map(EventMapper::eventToEventFullDto)
 				.collect(Collectors.toList());
+		eventDto.forEach(e -> e.setViews(idsAndHits.getOrDefault(e.getId(),0L)));
+
+		return eventDto;
 	}
 
 	@Override
@@ -109,18 +116,16 @@ public class EventServiceImpl implements EventService {
 			}
 		}
 
+		Event updatedEvent = updateEvents(event, updateEventAdminRequest);
+		Event savedEvent = eventRepository.saveAndFlush(updatedEvent);
 
-		Event newEvent = updateEvents(event, updateEventAdminRequest);
-		Event eventUPD = eventRepository.save(newEvent);
-		return EventMapper.eventToEventFullDto(eventUPD);
+		EventFullDto result = EventMapper.eventToEventFullDto(savedEvent);
+		return result;
 	}
 
 	@Override
 	public List<EventShortDto> findEventsForOwner(Long userId, Integer from, Integer size) {
-//		getUser(userId);
-//		if (!userRepository.existsById(userId)) {
-//			throw new NotFoundException("Пользователь с id= " + userId + " не найден");
-//		}
+
 		Pageable page = PageRequest.of(from / size, size);
 		List<Event> events = eventRepository.findAllByInitiatorId(userId, page).toList();
 		return events.stream()
@@ -310,7 +315,7 @@ public class EventServiceImpl implements EventService {
 		addStatsClient(request);
 		EventFullDto res = EventMapper.eventToEventFullDto(eventUPD);
 		res.setViews(views);
-		return EventMapper.eventToEventFullDto(eventUPD);
+		return res;
 	}
 
 	private User getUser(Long userId) {
@@ -325,8 +330,9 @@ public class EventServiceImpl implements EventService {
 		return eventRepository.findById(eventId).orElseThrow();
 	}
 
-	private Event getEventByEventIdAndUserId(Long eventId, Long userId) {
-		return eventRepository.findByIdAndInitiatorId(eventId, userId).orElseThrow();
+	private Event getEventByEventIdAndUserId( Long userId, Long eventId) {
+		Event res = eventRepository.findByIdAndInitiatorId(eventId, userId).orElseThrow();
+		return res;
 	}
 
 	private Event updateEvents(Event oldEvent, UpdateEventRequest updateEvent) {
@@ -428,9 +434,10 @@ public class EventServiceImpl implements EventService {
 
 		if (earliestDate != null) {
 			ResponseEntity<Object> response = statsClient.getStatistics(earliestDate, now, uris, true);
-
-			List<StatResponceDto> viewStatsList = objectMapper.convertValue(response.getBody(), new TypeReference<>() {
-			});
+			if (response.getStatusCode()!= HttpStatus.OK) {
+				return new HashMap<>();
+			}
+			List<StatResponceDto> viewStatsList = objectMapper.convertValue(response.getBody(), new TypeReference<>() {});
 
 			viewStatsMap = viewStatsList.stream()
 					.filter(stats -> stats.getUri().startsWith("/events/"))

@@ -28,9 +28,17 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public List<UserDto> getUsers(List<Long> ids, Integer from, Integer size) {
-		Sort sort = Sort.by("name").descending();
+		Sort sort = Sort.by("id");
 		Pageable page = PageRequest.of(from / size, size, sort);
-		return userRepository.findByIdIn(ids, page).toList().stream().map(UserMapper::userToUserDto).collect(Collectors.toList());
+		List<User> users;
+		if (ids == null || ids.isEmpty()) {
+			users = userRepository.findAll(page).toList();
+		} else {
+			users = userRepository.findByIdIn(ids, page).toList();
+		}
+
+		List<UserDto> usersDto = users.stream().map(UserMapper::userToUserDto).collect(Collectors.toList());
+		return usersDto;
 	}
 
 	@Override
