@@ -12,7 +12,7 @@ public class CompilationMapper {
 
 	public Compilation dtoToCompilation(NewCompilationDto compilationDto) {
 		return Compilation.builder()
-				.pinned(compilationDto.getPinned()==null?false:compilationDto.getPinned())
+				.pinned(compilationDto.getPinned() == null ? false : compilationDto.getPinned())
 				.title(compilationDto.getTitle())
 				.build();
 	}
