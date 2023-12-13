@@ -10,10 +10,13 @@ import ru.practicum.ewmservice.dto.UpdateEventAdminRequest;
 import ru.practicum.ewmservice.service.EventService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static ru.practicum.ewmservice.util.DateTimeUtil.DATE_TIME_FORMAT_PATTERN;
 
 @Slf4j
 @RestController
@@ -32,8 +35,8 @@ public class EventAdminController {
 	public List<EventFullDto> findEvents(@RequestParam(required = false) List<Long> users,
 	                                     @RequestParam(required = false) List<String> states,
 	                                     @RequestParam(required = false) List<Long> categories,
-	                                     @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
-	                                     @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
+	                                     @RequestParam(required = false) @DateTimeFormat(pattern = DATE_TIME_FORMAT_PATTERN) LocalDateTime rangeStart,
+	                                     @RequestParam(required = false) @DateTimeFormat(pattern = DATE_TIME_FORMAT_PATTERN) LocalDateTime rangeEnd,
 	                                     @PositiveOrZero @RequestParam(defaultValue = "0") int from,
 	                                     @Positive @RequestParam(defaultValue = "10") int size) {
 		log.info("Find events");
@@ -41,7 +44,7 @@ public class EventAdminController {
 	}
 
 	@PatchMapping("/{eventId}")
-	public EventFullDto patchEventById(@PathVariable Long eventId,
+	public EventFullDto patchEventById(@PathVariable @Min(1) long eventId,
 	                           @Valid @RequestBody UpdateEventAdminRequest updateEventAdminRequest) {
 		log.info("Patch event by id");
 		EventFullDto res = eventService.patchEventById(eventId, updateEventAdminRequest);

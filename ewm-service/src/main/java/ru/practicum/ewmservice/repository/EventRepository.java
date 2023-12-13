@@ -44,4 +44,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 	Page<Event> findEventsByFiltersSortByEventDate(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, Pageable page);
 
 	List<Event> findAllByIdIn(List<Long> eventIds);
+
+	Long countByCategoryId(Long catId);
 }

@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<UserDto> getUsers(List<Long> ids, Integer from, Integer size) {
+	public List<UserDto> getUsers(List<Long> ids, int from, int size) {
 		Sort sort = Sort.by("id");
 		Pageable page = PageRequest.of(from / size, size, sort);
 		List<User> users;
@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional
-	public void deleteUser(Long userId) {
+	public void deleteUser(long userId) {
 		userRepository.deleteById(userId);
 	}
 }

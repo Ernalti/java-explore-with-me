@@ -35,13 +35,13 @@ public class RequestServiceImpl implements RequestService {
 
 
 	@Override
-	public List<ParticipationRequestDto> findRequestsForUser(Long userId) {
+	public List<ParticipationRequestDto> findRequestsForUser(long userId) {
 		List<Request> result = requestRepository.findAllByRequesterId(userId);
 		return result.stream().map(RequestMapper::requestToDto).collect(Collectors.toList());
 	}
 
 	@Override
-	public ParticipationRequestDto createRequest(Long userId, Long eventId) {
+	public ParticipationRequestDto createRequest(long userId, long eventId) {
 		User user = getUser(userId);
 
 		Event event = eventRepository.findById(eventId).orElseThrow();
@@ -81,7 +81,7 @@ public class RequestServiceImpl implements RequestService {
 	}
 
 	@Override
-	public ParticipationRequestDto cancelRequest(Long userId, Long requestId) {
+	public ParticipationRequestDto cancelRequest(long userId, long requestId) {
 		getUser(userId);
 		Request request = requestRepository.findByIdAndRequesterId(requestId, userId).orElseThrow();
 		if (request.getStatus().equals(RequestStatus.CANCELED) || request.getStatus().equals(RequestStatus.REJECTED)) {
@@ -92,7 +92,7 @@ public class RequestServiceImpl implements RequestService {
 		return RequestMapper.requestToDto(requestAfterSave);
 	}
 
-	private User getUser(Long userId) {
+	private User getUser(long userId) {
 		return userRepository.findById(userId).orElseThrow(() ->
 				new NotFoundException("Категории с id = " + userId + " не существует"));
 	}

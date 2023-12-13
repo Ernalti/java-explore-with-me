@@ -11,6 +11,7 @@ import ru.practicum.ewmservice.dto.ValidationGroup;
 import ru.practicum.ewmservice.service.CompilationService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 
 @Slf4j
 @RestController
@@ -35,14 +36,14 @@ public class CompilationAdminController {
 
 	@PatchMapping("/{compId}")
 	public CompilationDto patchCompilation(@RequestBody @Valid NewCompilationDto compilationDto,
-	                                       @PathVariable Long compId) {
+	                                       @PathVariable @Min(1) long compId) {
 		log.info("patch compilation");
 		return compilationService.patchCompilation(compId, compilationDto);
 	}
 
 	@DeleteMapping("/{compId}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void deleteCompilation(@PathVariable Long compId) {
+	public void deleteCompilation(@PathVariable @Min(1) long compId) {
 		log.info("delete compilation");
 		compilationService.deleteCompilation(compId);
 	}

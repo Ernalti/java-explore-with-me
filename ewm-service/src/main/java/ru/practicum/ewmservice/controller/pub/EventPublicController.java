@@ -10,10 +10,14 @@ import ru.practicum.ewmservice.dto.EventShortDto;
 import ru.practicum.ewmservice.service.EventService;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static ru.practicum.ewmservice.util.DateTimeUtil.DATE_TIME_FORMAT_PATTERN;
 
 @Slf4j
 @RestController
@@ -29,30 +33,32 @@ public class EventPublicController {
 	}
 
 	@GetMapping
-	public List<EventShortDto> findPublicEvents(@RequestParam(required = false) String text,
+	public List<EventShortDto> findPublicEvents(@RequestParam(required = false) @Size(max = 7000) String text,
 	                                            @RequestParam(required = false) List<Long> categories,
 	                                            @RequestParam(required = false) Boolean paid,
 	                                            @RequestParam(required = false)
-	                                 @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	                                 LocalDateTime rangeStart,
+	                                            @DateTimeFormat(pattern = DATE_TIME_FORMAT_PATTERN)
+	                                            LocalDateTime rangeStart,
 	                                            @RequestParam(required = false)
-	                                 @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	                                 LocalDateTime rangeEnd,
-	                                            @RequestParam(defaultValue = "false") Boolean onlyAvailable,
+	                                            @DateTimeFormat(pattern = DATE_TIME_FORMAT_PATTERN)
+	                                            LocalDateTime rangeEnd,
+	                                            @RequestParam(defaultValue = "false") boolean onlyAvailable,
 	                                            @RequestParam(defaultValue = "event_date") String sort,
 	                                            @RequestParam(defaultValue = "0") @PositiveOrZero int from,
 	                                            @RequestParam(defaultValue = "10") @Positive int size,
-			                                    HttpServletRequest request) {
+	                                            HttpServletRequest request) {
 		log.info("Find public events");
+		eventService.addStatsClient(request);
 		return eventService.findPublicEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable,
-				sort, from, size, request);
+				sort, from, size);
 	}
 
 	@GetMapping("/{eventId}")
-	public EventFullDto findPublicEventyId(@PathVariable @Positive Long eventId,
+	public EventFullDto findPublicEventyId(@PathVariable @Positive @Min(1) long eventId,
 	                                       HttpServletRequest request) {
 		log.info("Find public event by id");
-		return eventService.findPublicEventyId(eventId, request);
+		eventService.addStatsClient(request);
+		return eventService.findPublicEventyId(eventId);
 	}
 
 }

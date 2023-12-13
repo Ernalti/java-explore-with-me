@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewmservice.dto.ParticipationRequestDto;
 import ru.practicum.ewmservice.service.RequestService;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.Positive;
 import java.util.List;
 
@@ -25,22 +26,22 @@ public class RequestPrivateController {
 	}
 
 	@GetMapping
-	public List<ParticipationRequestDto> findRequestsForUser(@PathVariable Long userId) {
+	public List<ParticipationRequestDto> findRequestsForUser(@PathVariable @Min(1) long userId) {
 		log.info("Find requests for user");
 		return requestService.findRequestsForUser(userId);
 	}
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public ParticipationRequestDto createRequest(@PathVariable Long userId,
-	                          @Positive @RequestParam Long eventId) {
+	public ParticipationRequestDto createRequest(@PathVariable @Min(1) long userId,
+	                          @Positive @RequestParam @Min(1) long eventId) {
 		log.info("Create request for user");
 		return requestService.createRequest(userId, eventId);
 	}
 
 	@PatchMapping("/{requestId}/cancel")
-	public ParticipationRequestDto cancelRequest(@PathVariable Long userId,
-	                                             @PathVariable Long requestId) {
+	public ParticipationRequestDto cancelRequest(@PathVariable @Min(1) long userId,
+	                                             @PathVariable @Min(1) long requestId) {
 		log.info("Cancel request");
 		return requestService.cancelRequest(userId, requestId);
 	}

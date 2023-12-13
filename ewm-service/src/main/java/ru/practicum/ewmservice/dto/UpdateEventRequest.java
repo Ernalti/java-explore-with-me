@@ -7,6 +7,8 @@ import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
+import static ru.practicum.ewmservice.util.DateTimeUtil.DATE_TIME_FORMAT_PATTERN;
+
 @Data
 public class UpdateEventRequest {
 
@@ -18,7 +20,7 @@ public class UpdateEventRequest {
 	@Size(min = 20, max = 7000)
 	private String description;
 
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_TIME_FORMAT_PATTERN)
 	@FutureOrPresent
 	private LocalDateTime eventDate;
 

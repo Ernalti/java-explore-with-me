@@ -28,11 +28,12 @@ import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ValidationException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static ru.practicum.ewmservice.util.DateTimeUtil.DATE_TIME_FORMATTER;
 
 @ComponentScan("ru.practicum.stat_client")
 @Service
@@ -92,7 +93,7 @@ public class EventServiceImpl implements EventService {
 
 	@Override
 	@Transactional
-	public EventFullDto patchEventById(Long eventId, UpdateEventAdminRequest updateEventAdminRequest) {
+	public EventFullDto patchEventById(long eventId, UpdateEventAdminRequest updateEventAdminRequest) {
 		Event event = eventRepository.findById(eventId).orElseThrow();
 
 		if (!event.getState().equals(EventState.PENDING)) {
@@ -124,7 +125,7 @@ public class EventServiceImpl implements EventService {
 	}
 
 	@Override
-	public List<EventShortDto> findEventsForOwner(Long userId, Integer from, Integer size) {
+	public List<EventShortDto> findEventsForOwner(long userId, int from, int size) {
 
 		Pageable page = PageRequest.of(from / size, size);
 		List<Event> events = eventRepository.findAllByInitiatorId(userId, page).toList();
@@ -135,7 +136,7 @@ public class EventServiceImpl implements EventService {
 
 	@Override
 	@Transactional
-	public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
+	public EventFullDto createEvent(long userId, NewEventDto newEventDto) {
 
 		User user = getUser(userId);
 		if (newEventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
@@ -156,7 +157,7 @@ public class EventServiceImpl implements EventService {
 	}
 
 	@Override
-	public EventFullDto findEventByIdForOwner(Long userId, Long eventId) {
+	public EventFullDto findEventByIdForOwner(long userId, long eventId) {
 		getUser(userId);
 
 		Event event = getEventByEventIdAndUserId(userId, eventId);
@@ -168,7 +169,7 @@ public class EventServiceImpl implements EventService {
 
 	@Override
 	@Transactional
-	public EventFullDto patchEventByIdForOwner(Long userId, Long eventId, UpdateEventUserRequest updateEvent) {
+	public EventFullDto patchEventByIdForOwner(long userId, long eventId, UpdateEventUserRequest updateEvent) {
 		getUser(userId);
 
 		Event event = getEvent(eventId);
@@ -198,7 +199,7 @@ public class EventServiceImpl implements EventService {
 	}
 
 	@Override
-	public List<ParticipationRequestDto> findEventsRequests(Long userId, Long eventId) {
+	public List<ParticipationRequestDto> findEventsRequests(long userId, long eventId) {
 		getUser(userId);
 		getEventByEventIdAndUserId(userId, eventId);
 		List<Request> requests = requestRepository.findAllByEventId(eventId);
@@ -207,7 +208,7 @@ public class EventServiceImpl implements EventService {
 
 	@Override
 	@Transactional
-	public EventRequestStatusUpdateResult patchEventsRequests(Long userId, Long eventId, EventRequestStatusUpdateRequest updateRequest) {
+	public EventRequestStatusUpdateResult patchEventsRequests(long userId, long eventId, EventRequestStatusUpdateRequest updateRequest) {
 		getUser(userId);
 		Event event = getEventByEventIdAndUserId(userId, eventId);
 
@@ -267,7 +268,7 @@ public class EventServiceImpl implements EventService {
 	}
 
 	@Override
-	public List<EventShortDto> findPublicEvents(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, String sort, int from, int size, HttpServletRequest request) {
+	public List<EventShortDto> findPublicEvents(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, boolean onlyAvailable, String sort, int from, int size) {
 		Sort sort1 = Sort.valueOf(sort.toUpperCase());
 		Pageable page = PageRequest.of(from / size, size);
 
@@ -277,7 +278,6 @@ public class EventServiceImpl implements EventService {
 
 		List<Event> events = eventRepository.findEventsByFiltersSortByEventDate(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, page).toList();
 
-		addStatsClient(request);
 		Map<Long,Long> idsAndHits = getViews(events);
 		List<EventShortDto> eventDto = events.stream()
 				.map(EventMapper::eventToEventShortDto)
@@ -298,36 +298,36 @@ public class EventServiceImpl implements EventService {
 	}
 
 	@Override
-	public EventFullDto findPublicEventyId(Long eventId, HttpServletRequest request) {
+	public EventFullDto findPublicEventyId(long eventId) {
 		Event event = eventRepository.findById(eventId)
 				.orElseThrow(() -> new EntityNotFoundException("Event" + eventId + "not found"));
 
-		Long views = getEventViews(event);
+		long views = getEventViews(event);
 
 		if (!event.getState().equals(EventState.PUBLISHED)) {
 			throw new EntityNotFoundException(String.format("Event %s not found", eventId));
 		}
 
 		Event eventUPD = eventRepository.save(event);
-		addStatsClient(request);
+
 		EventFullDto res = EventMapper.eventToEventFullDto(eventUPD);
 		res.setViews(views);
 		return res;
 	}
 
-	private User getUser(Long userId) {
+	private User getUser(long userId) {
 		return userRepository.findById(userId).orElseThrow();
 	}
 
-	private Category getCategory(Long catId) {
+	private Category getCategory(long catId) {
 		return categoryRepository.findById(catId).orElseThrow();
 	}
 
-	private Event getEvent(Long eventId) {
+	private Event getEvent(long eventId) {
 		return eventRepository.findById(eventId).orElseThrow();
 	}
 
-	private Event getEventByEventIdAndUserId(Long userId, Long eventId) {
+	private Event getEventByEventIdAndUserId(long userId, long eventId) {
 		Event res = eventRepository.findByIdAndInitiatorId(eventId, userId).orElseThrow();
 		return res;
 	}
@@ -378,8 +378,8 @@ public class EventServiceImpl implements EventService {
 
 	private long getEventViews(Event event) {
 
-		ResponseEntity<Object> objectResponseEntity = statsClient.getStatistics(event.getCreatedOn().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
-				event.getEventDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+		ResponseEntity<Object> objectResponseEntity = statsClient.getStatistics(event.getCreatedOn().format(DATE_TIME_FORMATTER),
+				event.getEventDate().format(DATE_TIME_FORMATTER),
 				List.of("/events/" + event.getId()),
 				true);
 
@@ -397,7 +397,8 @@ public class EventServiceImpl implements EventService {
 		return views;
 	}
 
-	private void addStatsClient(HttpServletRequest request) {
+	@Override
+	public void addStatsClient(HttpServletRequest request) {
 		StatDto hit = StatDto.builder()
 				.app(applicationName)
 				.uri(request.getRequestURI())
@@ -410,10 +411,8 @@ public class EventServiceImpl implements EventService {
 	private Map<Long, Long> getViews(List<Event> events) {
 
 		if (events.size() == 0) {
-			return new HashMap<>();
+			return Collections.emptyMap();
 		}
-
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
 		List<String> uris = events.stream()
 				.map(event -> String.format("/events/%s", event.getId()))
@@ -424,14 +423,15 @@ public class EventServiceImpl implements EventService {
 				.collect(Collectors.toList());
 		String earliestDate = startDates.stream()
 				.min(LocalDateTime::compareTo)
-				.orElse(null).format(formatter);
-		String now = LocalDateTime.now().format(formatter);
-		Map<Long, Long> viewStatsMap = new HashMap<>();
+				.map(date -> date.format(DATE_TIME_FORMATTER))
+				.orElse(null);
+		String now = LocalDateTime.now().format(DATE_TIME_FORMATTER);
+		Map<Long, Long> viewStatsMap = Collections.emptyMap();
 
 		if (earliestDate != null) {
 			ResponseEntity<Object> response = statsClient.getStatistics(earliestDate, now, uris, true);
 			if (response.getStatusCode() != HttpStatus.OK) {
-				return new HashMap<>();
+				return Collections.emptyMap();
 			}
 			List<StatResponceDto> viewStatsList = objectMapper.convertValue(response.getBody(), new TypeReference<>() {});
 

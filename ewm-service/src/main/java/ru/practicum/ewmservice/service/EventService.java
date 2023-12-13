@@ -9,21 +9,24 @@ import java.util.List;
 public interface EventService {
 	List<EventFullDto> findEvents(List<Long> users, List<String> states, List<Long> categories, LocalDateTime rangeStart, LocalDateTime rangeEnd, int from, int size);
 
-	EventFullDto patchEventById(Long eventId, UpdateEventAdminRequest updateEventAdminRequest);
+	EventFullDto patchEventById(long eventId, UpdateEventAdminRequest updateEventAdminRequest);
 
-	List<EventShortDto> findEventsForOwner(Long userId, Integer from, Integer size);
+	List<EventShortDto> findEventsForOwner(long userId, int from, int size);
 
-	EventFullDto createEvent(Long userId, NewEventDto newEventDto);
+	EventFullDto createEvent(long userId, NewEventDto newEventDto);
 
-	EventFullDto findEventByIdForOwner(Long userId, Long eventId);
+	EventFullDto findEventByIdForOwner(long userId, long eventId);
 
-	EventFullDto patchEventByIdForOwner(Long userId, Long eventId, UpdateEventUserRequest updateEvent);
+	EventFullDto patchEventByIdForOwner(long userId, long eventId, UpdateEventUserRequest updateEvent);
 
-	List<ParticipationRequestDto> findEventsRequests(Long userId, Long eventId);
+	List<ParticipationRequestDto> findEventsRequests(long userId, long eventId);
 
-	EventRequestStatusUpdateResult patchEventsRequests(Long userId, Long eventId, EventRequestStatusUpdateRequest updateRequest);
+	EventRequestStatusUpdateResult patchEventsRequests(long userId, long eventId, EventRequestStatusUpdateRequest updateRequest);
 
-	List<EventShortDto> findPublicEvents(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, String sort, int from, int size, HttpServletRequest request);
+	List<EventShortDto> findPublicEvents(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, boolean onlyAvailable, String sort, int from, int size);
 
-	EventFullDto findPublicEventyId(Long eventId, HttpServletRequest request);
+	EventFullDto findPublicEventyId(long eventId);
+
+	void addStatsClient(HttpServletRequest request);
+
 }

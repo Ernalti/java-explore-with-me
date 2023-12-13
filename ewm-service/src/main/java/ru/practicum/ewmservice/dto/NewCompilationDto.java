@@ -14,13 +14,13 @@ import java.util.Set;
 @NoArgsConstructor
 @Builder
 public class NewCompilationDto {
-	Set<Long> events;
+	private Set<Long> events;
 
-	@Builder.Default
-	Boolean pinned = false;
+
+	private Boolean pinned;
 
 	@NotBlank(groups = ValidationGroup.CreateUser.class)
 	@Size(max = 50)
-	String title;
+	private String title;
 
 }

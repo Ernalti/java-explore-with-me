@@ -23,7 +23,7 @@ public class Event {
 	@Column(nullable = false)
 	private String annotation;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "category_id")
 	private Category category;
 
@@ -35,14 +35,14 @@ public class Event {
 	@Column(nullable = false)
 	private LocalDateTime eventDate;
 
-	@OneToMany(mappedBy = "event")
+	@OneToMany(mappedBy = "event", fetch = FetchType.LAZY)
 	private List<Request> requests;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "initiator_id")
 	private User initiator;
 
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "location_id")
 	private Location location;
 

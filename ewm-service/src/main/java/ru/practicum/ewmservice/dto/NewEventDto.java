@@ -12,6 +12,8 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
+import static ru.practicum.ewmservice.util.DateTimeUtil.DATE_TIME_FORMAT_PATTERN;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -30,7 +32,7 @@ public class NewEventDto {
 	@Size(min = 20, max = 7000)
 	private String description;
 
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_TIME_FORMAT_PATTERN)
 	@NotNull
 	private LocalDateTime eventDate;
 

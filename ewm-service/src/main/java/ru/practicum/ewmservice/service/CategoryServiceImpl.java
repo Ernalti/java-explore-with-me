@@ -8,9 +8,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewmservice.dto.CategoryDto;
 import ru.practicum.ewmservice.dto.NewCategoryDto;
+import ru.practicum.ewmservice.exception.exceptions.ConflictException;
 import ru.practicum.ewmservice.mapper.CategoryMapper;
 import ru.practicum.ewmservice.model.Category;
 import ru.practicum.ewmservice.repository.CategoryRepository;
+import ru.practicum.ewmservice.repository.EventRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,11 +23,13 @@ import java.util.stream.Collectors;
 public class CategoryServiceImpl implements CategoryService {
 
 	private final CategoryRepository categoryRepository;
+	private final EventRepository eventRepository;
 
 	@Autowired
-	public CategoryServiceImpl(CategoryRepository categoryRepository) {
+	public CategoryServiceImpl(CategoryRepository categoryRepository, EventRepository eventRepository) {
 		this.categoryRepository = categoryRepository;
 
+		this.eventRepository = eventRepository;
 	}
 
 	@Override
@@ -37,13 +41,16 @@ public class CategoryServiceImpl implements CategoryService {
 
 	@Override
 	@Transactional
-	public void deleteCategoryById(Long catId) {
+	public void deleteCategoryById(long catId) {
+		if (eventRepository.countByCategoryId(catId) > 0L) {
+			throw new ConflictException("All events must be delete");
+		}
 		categoryRepository.deleteById(catId);
 	}
 
 	@Override
 	@Transactional
-	public CategoryDto patchCategoryById(Long catId, NewCategoryDto newCategoryDto) {
+	public CategoryDto patchCategoryById(long catId, NewCategoryDto newCategoryDto) {
 		Category category = CategoryMapper.newCategoryDtoToCategory(newCategoryDto);
 		Category oldCategory = getCategory(catId);
 		oldCategory.setName(category.getName());
@@ -51,18 +58,18 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	@Override
-	public List<CategoryDto> getCategories(Integer from, Integer size) {
+	public List<CategoryDto> getCategories(int from, int size) {
 		Sort sort = Sort.by("name").descending();
 		Pageable page = PageRequest.of(from / size, size, sort);
 		return categoryRepository.findAll(page).stream().map(CategoryMapper::categoryToCategoryDto).collect(Collectors.toList());
 	}
 
 	@Override
-	public CategoryDto getCategoryById(Long catId) {
+	public CategoryDto getCategoryById(long catId) {
 		return CategoryMapper.categoryToCategoryDto(getCategory(catId));
 	}
 
-	private Category getCategory(Long catId) {
+	private Category getCategory(long catId) {
 		return categoryRepository.findById(catId).orElseThrow();
 	}
 }

@@ -20,9 +20,9 @@ public class Compilation {
 
 	private String title;
 
-	private Boolean pinned;
+	private boolean pinned;
 
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(
 			name = "events_compilation",
 			joinColumns = @JoinColumn(name = "compilation_id"),

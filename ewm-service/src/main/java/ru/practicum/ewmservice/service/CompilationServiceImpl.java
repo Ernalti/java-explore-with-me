@@ -33,11 +33,14 @@ public class CompilationServiceImpl implements CompilationService {
 	@Transactional
 	public CompilationDto createCompilation(NewCompilationDto compilationDto) {
 		Compilation compilation = CompilationMapper.dtoToCompilation(compilationDto);
-		compilation.setPinned(compilation.getPinned() != null && compilation.getPinned());
+		compilation.setPinned(compilation.isPinned());
 
 		Set<Long> compEventIds = (compilationDto.getEvents() != null) ? compilationDto.getEvents() : Collections.emptySet();
 		List<Long> eventIds = new ArrayList<>(compEventIds);
-		List<Event> events = eventRepository.findAllByIdIn(eventIds);
+		List<Event> events = new ArrayList<>();
+		if (eventIds != null && eventIds.size()>0) {
+			events = eventRepository.findAllByIdIn(eventIds);
+		}
 		Set<Event> eventsSet = new HashSet<>(events);
 		compilation.setEvents(eventsSet);
 
@@ -46,18 +49,23 @@ public class CompilationServiceImpl implements CompilationService {
 
 	@Override
 	@Transactional
-	public CompilationDto patchCompilation(Long compId, NewCompilationDto compilationDto) {
+	public CompilationDto patchCompilation(long compId, NewCompilationDto compilationDto) {
+		if (compilationDto.getPinned()==null &&
+				(compilationDto.getEvents()==null || compilationDto.getEvents().size()==0) &&
+				(compilationDto.getTitle()==null || compilationDto.getTitle().isBlank())) {
+			throw new ConditionException("All arguments are null");
+		}
 		Compilation compilation = getCompilation(compId);
 
 		Set<Long> eventIds =  compilationDto.getEvents();
 
-		if (eventIds != null) {
+		if (eventIds != null && eventIds.size()>0) {
 			List<Event> events = eventRepository.findAllByIdIn(new ArrayList<>(eventIds));
 			Set<Event> eventSet = new HashSet<>(events);
 			compilation.setEvents(eventSet);
 		}
 
-		compilation.setPinned(compilation.getPinned() != null && compilation.getPinned());
+		compilation.setPinned(compilation.isPinned());
 		if (compilation.getTitle().isBlank()) {
 			throw new ConditionException("Title can't be is blank");
 		}
@@ -68,13 +76,13 @@ public class CompilationServiceImpl implements CompilationService {
 
 	@Override
 	@Transactional
-	public void deleteCompilation(Long compId) {
+	public void deleteCompilation(long compId) {
 		getCompilation(compId);
 		compilationRepository.deleteById(compId);
 	}
 
 	@Override
-	public List<CompilationDto> getCompilations(Boolean pinned, Integer from, Integer size) {
+	public List<CompilationDto> getCompilations(Boolean pinned, int from, int size) {
 		PageRequest pageRequest = PageRequest.of(from, size);
 		List<Compilation> compilations;
 		if (pinned == null) {
@@ -89,11 +97,11 @@ public class CompilationServiceImpl implements CompilationService {
 	}
 
 	@Override
-	public CompilationDto getCompilationsById(Long compId) {
+	public CompilationDto getCompilationsById(long compId) {
 		return CompilationMapper.compilationToDto(getCompilation(compId));
 	}
 
-	private Compilation getCompilation(Long compId) {
+	private Compilation getCompilation(long compId) {
 		return compilationRepository.findById(compId).orElseThrow();
 	}
 }

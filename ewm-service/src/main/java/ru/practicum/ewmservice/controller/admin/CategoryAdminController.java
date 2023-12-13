@@ -10,6 +10,7 @@ import ru.practicum.ewmservice.dto.NewCategoryDto;
 import ru.practicum.ewmservice.service.CategoryService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 
 @Slf4j
 @RestController
@@ -33,13 +34,13 @@ public class CategoryAdminController {
 
 	@DeleteMapping("/{catId}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void deleteCategoryById(@PathVariable Long catId) {
+	public void deleteCategoryById(@PathVariable @Min(1)  long catId) {
 		log.info("Delete category by id");
 		categoryService.deleteCategoryById(catId);
 	}
 
 	@PatchMapping("/{catId}")
-	public CategoryDto patchCategoryById(@PathVariable Long catId, @Valid @RequestBody NewCategoryDto newCategoryDto) {
+	public CategoryDto patchCategoryById(@PathVariable @Min(1) long catId, @Valid @RequestBody NewCategoryDto newCategoryDto) {
 		log.info("Patch category by id");
 		return categoryService.patchCategoryById(catId, newCategoryDto);
 
