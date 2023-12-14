@@ -31,7 +31,7 @@ public class CommentAdminController {
 	@GetMapping("/user/{userId}/comments")
 	public List<CommentDto> getCommentsForUser(@PathVariable @Min(1) long userId,
 	                                            @RequestParam(defaultValue = "0") @PositiveOrZero int from,
-	                                            @RequestParam(defaultValue = "10") @Positive int size){
+	                                            @RequestParam(defaultValue = "10") @Positive int size) {
 		log.info("Get comments from admin");
 
 		return commentService.getCommentsForUser(userId, from, size);
@@ -39,7 +39,7 @@ public class CommentAdminController {
 
 	@GetMapping("/comments")
 	public List<CommentDto> getAllComments(@RequestParam(defaultValue = "0") @PositiveOrZero int from,
-	                                       @RequestParam(defaultValue = "10") @Positive int size){
+	                                       @RequestParam(defaultValue = "10") @Positive int size) {
 		log.info("Get all comments from admin");
 
 		return commentService.getAllComments(from, size);

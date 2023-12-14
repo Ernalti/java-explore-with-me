@@ -56,7 +56,7 @@ public class CommentPrivateController {
 	@GetMapping("/comments")
 	public List<CommentDto> getCommentsForUser(@PathVariable @Min(1) long userId,
 	                                            @RequestParam(defaultValue = "0") @PositiveOrZero int from,
-	                                            @RequestParam(defaultValue = "10") @Positive int size){
+	                                            @RequestParam(defaultValue = "10") @Positive int size) {
 		log.info("Get comments");
 		return commentService.getCommentsForUser(userId, from, size);
 	}

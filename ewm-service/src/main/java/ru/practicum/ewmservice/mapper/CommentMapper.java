@@ -8,7 +8,7 @@ import ru.practicum.ewmservice.model.Comment;
 @UtilityClass
 public class CommentMapper {
 
-	public CommentDto commentToDto(Comment comment){
+	public CommentDto commentToDto(Comment comment) {
 		return CommentDto.builder()
 				.id(comment.getId())
 				.text(comment.getText())
@@ -20,7 +20,7 @@ public class CommentMapper {
 				.build();
 	}
 
-	public Comment dtoToComment(CommentRequestDto commentRequestDto){
+	public Comment dtoToComment(CommentRequestDto commentRequestDto) {
 		return Comment.builder()
 				.text(commentRequestDto.getText())
 				.moderated(false)
