@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.statdto.StatDto;
-import ru.practicum.statserver.dto.StatResponceDto;
+import ru.practicum.statdto.StatResponceDto;
 import ru.practicum.statserver.service.StatService;
 
 import javax.validation.Valid;

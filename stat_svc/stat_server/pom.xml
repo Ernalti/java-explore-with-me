@@ -57,7 +57,6 @@
             <groupId>ru.practicum</groupId>
             <artifactId>stat-dto</artifactId>
             <version>0.0.1-SNAPSHOT</version>
-
         </dependency>
     </dependencies>
 
