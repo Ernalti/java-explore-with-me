@@ -39,7 +39,7 @@ public class RequestPrivateController {
 		return requestService.createRequest(userId, eventId);
 	}
 
-	@PatchMapping("/{requestId}/cancel")
+	@DeleteMapping("/{requestId}/cancel")
 	public ParticipationRequestDto cancelRequest(@PathVariable @Min(1) long userId,
 	                                             @PathVariable @Min(1) long requestId) {
 		log.info("Cancel request");
