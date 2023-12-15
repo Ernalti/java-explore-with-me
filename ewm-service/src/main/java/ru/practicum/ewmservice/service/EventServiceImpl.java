@@ -94,7 +94,8 @@ public class EventServiceImpl implements EventService {
 
 	@Override
 	public List<EventFullDto> findEvents(List<Long> users, List<String> states, List<Long> categories, LocalDateTime rangeStart, LocalDateTime rangeEnd, int from, int size) {
-		Pageable page = PageRequest.of(from / size, size);
+		org.springframework.data.domain.Sort sort = org.springframework.data.domain.Sort.by("id");
+		PageRequest page = PageRequest.of(from, size, sort);
 
 		if (rangeStart != null && rangeEnd != null && rangeStart.isAfter(rangeEnd)) {
 			throw new ValidationException("End time cannot be earlier than start time");
