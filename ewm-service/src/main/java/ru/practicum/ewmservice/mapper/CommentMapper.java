@@ -5,6 +5,8 @@ import ru.practicum.ewmservice.dto.CommentDto;
 import ru.practicum.ewmservice.dto.CommentRequestDto;
 import ru.practicum.ewmservice.model.Comment;
 
+import java.time.LocalDateTime;
+
 @UtilityClass
 public class CommentMapper {
 
@@ -23,6 +25,8 @@ public class CommentMapper {
 	public Comment dtoToComment(CommentRequestDto commentRequestDto) {
 		return Comment.builder()
 				.text(commentRequestDto.getText())
+				.created(LocalDateTime.now())
+				.updated(LocalDateTime.now())
 				.moderated(false)
 				.build();
 	}

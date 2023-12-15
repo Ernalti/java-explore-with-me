@@ -11,15 +11,38 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.ewmservice.dto.*;
+import ru.practicum.ewmservice.dto.EventFullDto;
+import ru.practicum.ewmservice.dto.EventRequestStatusUpdateRequest;
+import ru.practicum.ewmservice.dto.EventRequestStatusUpdateResult;
+import ru.practicum.ewmservice.dto.EventShortDto;
+import ru.practicum.ewmservice.dto.LocationDto;
+import ru.practicum.ewmservice.dto.NewEventDto;
+import ru.practicum.ewmservice.dto.ParticipationRequestDto;
+import ru.practicum.ewmservice.dto.UpdateEventAdminRequest;
+import ru.practicum.ewmservice.dto.UpdateEventRequest;
+import ru.practicum.ewmservice.dto.UpdateEventUserRequest;
 import ru.practicum.ewmservice.exception.exceptions.ConditionException;
 import ru.practicum.ewmservice.exception.exceptions.ConflictException;
 import ru.practicum.ewmservice.mapper.EventMapper;
 import ru.practicum.ewmservice.mapper.LocationMapper;
 import ru.practicum.ewmservice.mapper.RequestMapper;
-import ru.practicum.ewmservice.model.*;
-import ru.practicum.ewmservice.model.enums.*;
-import ru.practicum.ewmservice.repository.*;
+import ru.practicum.ewmservice.model.Category;
+import ru.practicum.ewmservice.model.CountComments;
+import ru.practicum.ewmservice.model.Event;
+import ru.practicum.ewmservice.model.Location;
+import ru.practicum.ewmservice.model.Request;
+import ru.practicum.ewmservice.model.User;
+import ru.practicum.ewmservice.model.enums.EventState;
+import ru.practicum.ewmservice.model.enums.RequestStatus;
+import ru.practicum.ewmservice.model.enums.Sort;
+import ru.practicum.ewmservice.model.enums.StateActionAdmin;
+import ru.practicum.ewmservice.model.enums.StateActionUser;
+import ru.practicum.ewmservice.repository.CategoryRepository;
+import ru.practicum.ewmservice.repository.CommentRepository;
+import ru.practicum.ewmservice.repository.EventRepository;
+import ru.practicum.ewmservice.repository.LocationRepository;
+import ru.practicum.ewmservice.repository.RequestRepository;
+import ru.practicum.ewmservice.repository.UserRepository;
 import ru.practicum.stat_client.StatsClient;
 import ru.practicum.statdto.StatDto;
 import ru.practicum.statdto.StatResponceDto;
@@ -28,7 +51,11 @@ import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ValidationException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -50,9 +77,10 @@ public class EventServiceImpl implements EventService {
 	private final LocationRepository locationRepository;
 	private final EventRepository eventRepository;
 	private final RequestRepository requestRepository;
+	private final CommentRepository commentRepository;
 
 	@Autowired
-	public EventServiceImpl(StatsClient statsClient, ObjectMapper objectMapper, UserRepository userRepository, CategoryRepository categoryRepository, LocationRepository locationRepository, EventRepository eventRepository, RequestRepository requestRepository) {
+	public EventServiceImpl(StatsClient statsClient, ObjectMapper objectMapper, UserRepository userRepository, CategoryRepository categoryRepository, LocationRepository locationRepository, EventRepository eventRepository, RequestRepository requestRepository, CommentRepository commentRepository) {
 		this.statsClient = statsClient;
 		this.objectMapper = objectMapper;
 		this.userRepository = userRepository;
@@ -60,6 +88,7 @@ public class EventServiceImpl implements EventService {
 		this.locationRepository = locationRepository;
 		this.eventRepository = eventRepository;
 		this.requestRepository = requestRepository;
+		this.commentRepository = commentRepository;
 	}
 
 
@@ -71,9 +100,7 @@ public class EventServiceImpl implements EventService {
 			throw new ValidationException("End time cannot be earlier than start time");
 		}
 
-
 		List<EventState> eventStates = null;
-
 		if (states != null) {
 			eventStates = states.stream()
 					.map(EventState::valueOf)
@@ -81,14 +108,7 @@ public class EventServiceImpl implements EventService {
 		}
 
 		List<Event> events = eventRepository.searchEvents(users, eventStates, categories, rangeStart, rangeEnd, page).toList();
-
-		Map<Long,Long> idsAndHits = getViews(events);
-		List<EventFullDto> eventDto = events.stream()
-				.map(EventMapper::eventToEventFullDto)
-				.collect(Collectors.toList());
-		eventDto.forEach(e -> e.setViews(idsAndHits.getOrDefault(e.getId(),0L)));
-
-		return eventDto;
+		return toListFullDto(events);
 	}
 
 	@Override
@@ -120,7 +140,7 @@ public class EventServiceImpl implements EventService {
 		Event updatedEvent = updateEvents(event, updateEventAdminRequest);
 		Event savedEvent = eventRepository.saveAndFlush(updatedEvent);
 
-		EventFullDto result = EventMapper.eventToEventFullDto(savedEvent);
+		EventFullDto result = toFullDto(savedEvent);
 		return result;
 	}
 
@@ -153,7 +173,7 @@ public class EventServiceImpl implements EventService {
 			event.setLocation(location);
 		}
 		Event newEvent = eventRepository.save(event);
-		return EventMapper.eventToEventFullDto(newEvent);
+		return toFullDto(newEvent);
 	}
 
 	@Override
@@ -164,7 +184,7 @@ public class EventServiceImpl implements EventService {
 		if (event == null) {
 			throw new EntityNotFoundException("Event" + eventId + "not found");
 		}
-		return EventMapper.eventToEventFullDto(event);
+		return toFullDto(event);
 	}
 
 	@Override
@@ -195,7 +215,7 @@ public class EventServiceImpl implements EventService {
 
 		Event newEvent = updateEvents(event, updateEvent);
 		Event eventUPD = eventRepository.save(newEvent);
-		return EventMapper.eventToEventFullDto(eventUPD);
+		return toFullDto(eventUPD);
 	}
 
 	@Override
@@ -310,7 +330,7 @@ public class EventServiceImpl implements EventService {
 
 		Event eventUPD = eventRepository.save(event);
 
-		EventFullDto res = EventMapper.eventToEventFullDto(eventUPD);
+		EventFullDto res = toFullDto(eventUPD);
 		res.setViews(views);
 		return res;
 	}
@@ -444,4 +464,28 @@ public class EventServiceImpl implements EventService {
 		}
 		return viewStatsMap;
 	}
+
+	private EventFullDto toFullDto(Event event) {
+		EventFullDto eventDto = EventMapper.eventToEventFullDto(event);
+		Long countComments = commentRepository.countCommentsByEventId(event.getId());
+		eventDto.setComments(countComments);
+		return eventDto;
+	}
+
+	private List<EventFullDto> toListFullDto(List<Event> events) {
+		List<Long> eventIds = events.stream()
+				.map(Event::getId)
+				.collect(Collectors.toList());
+		List<EventFullDto> eventsDto = events.stream()
+				.map(EventMapper::eventToEventFullDto)
+				.collect(Collectors.toList());
+		List<CountComments> ListCountComments = commentRepository.countCommentsByEventIds(eventIds);
+		Map<Long, Long> countComments = ListCountComments.stream().collect(Collectors.toMap(
+				CountComments::getEventId, CountComments::getCountComments));
+		Map<Long,Long> idsAndHits = getViews(events);
+		eventsDto.forEach(e -> e.setComments(countComments.getOrDefault(e.getId(), 0L)));
+		eventsDto.forEach(e -> e.setViews(idsAndHits.getOrDefault(e.getId(),0L)));
+		return eventsDto;
+	}
+
 }

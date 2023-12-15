@@ -16,7 +16,6 @@ import ru.practicum.ewmservice.repository.CommentRepository;
 import ru.practicum.ewmservice.repository.EventRepository;
 import ru.practicum.ewmservice.repository.UserRepository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,7 +49,6 @@ public class CommentServiceImpl implements CommentService {
 		Comment comment = CommentMapper.dtoToComment(commentRequestDto);
 		Comment updatedComment = commentRepository.findById(commentId).orElseThrow();
 		mergeComments(updatedComment, comment);
-		updatedComment.setUpdated(LocalDateTime.now());
 		updatedComment.setModerated(true);
 		return CommentMapper.commentToDto(commentRepository.save(updatedComment));
 
@@ -80,8 +78,6 @@ public class CommentServiceImpl implements CommentService {
 			throw new ConflictException("The event is not published");
 		}
 		comment.setEvent(eventRepository.findById(eventId).orElseThrow());
-		comment.setCreated(LocalDateTime.now());
-		comment.setUpdated(LocalDateTime.now());
 		return CommentMapper.commentToDto(commentRepository.save(comment));
 	}
 
@@ -92,7 +88,6 @@ public class CommentServiceImpl implements CommentService {
 		userRepository.findById(userId).orElseThrow();
 		Comment updatedComment = commentRepository.findByIdAndAuthorId(commentId,userId).orElseThrow();
 		mergeComments(updatedComment, comment);
-		updatedComment.setUpdated(LocalDateTime.now());
 		return CommentMapper.commentToDto(commentRepository.save(updatedComment));
 	}
 
@@ -121,6 +116,7 @@ public class CommentServiceImpl implements CommentService {
 	}
 
 	private void mergeComments(Comment updatedComment, Comment comment) {
+		updatedComment.setUpdated(comment.getCreated());
 		updatedComment.setText(comment.getText());
 	}
 }
