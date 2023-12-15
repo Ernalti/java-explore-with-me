@@ -479,8 +479,8 @@ public class EventServiceImpl implements EventService {
 		List<EventFullDto> eventsDto = events.stream()
 				.map(EventMapper::eventToEventFullDto)
 				.collect(Collectors.toList());
-		List<CountComments> ListCountComments = commentRepository.countCommentsByEventIds(eventIds);
-		Map<Long, Long> countComments = ListCountComments.stream().collect(Collectors.toMap(
+		List<CountComments> listCountComments = commentRepository.countCommentsByEventIds(eventIds);
+		Map<Long, Long> countComments = listCountComments.stream().collect(Collectors.toMap(
 				CountComments::getEventId, CountComments::getCountComments));
 		Map<Long,Long> idsAndHits = getViews(events);
 		eventsDto.forEach(e -> e.setComments(countComments.getOrDefault(e.getId(), 0L)));
