@@ -1,6 +1,13 @@
 package ru.practicum.ewmservice.service;
 
-import ru.practicum.ewmservice.dto.*;
+import ru.practicum.ewmservice.dto.EventFullDto;
+import ru.practicum.ewmservice.dto.EventRequestStatusUpdateRequest;
+import ru.practicum.ewmservice.dto.EventRequestStatusUpdateResult;
+import ru.practicum.ewmservice.dto.EventShortDto;
+import ru.practicum.ewmservice.dto.NewEventDto;
+import ru.practicum.ewmservice.dto.ParticipationRequestDto;
+import ru.practicum.ewmservice.dto.UpdateEventAdminRequest;
+import ru.practicum.ewmservice.dto.UpdateEventUserRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
